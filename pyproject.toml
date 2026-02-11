@@ -1,0 +1,15 @@
+[project]
+name = "synthetica"
+version = "0.1.0"
+description = "Prompt-driven synthetic dataset generator"
+authors = [{ name = "Ashwin" }]
+dependencies = [
+    "openai>=1.0.0",
+    "pandas",
+    "numpy",
+    "pydantic"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
