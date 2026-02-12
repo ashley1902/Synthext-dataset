@@ -251,6 +251,7 @@ Columns: prescription_id (text), patient_name (text), patient_dob (text), doctor
     "prescribed_date": {"role": "chronological"}
   }
 }
+
 """
 
 # ==============================

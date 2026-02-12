@@ -1,15 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "synthetica"
+name = "synthext"
 version = "0.1.0"
-description = "Prompt-driven synthetic dataset generator"
-authors = [{ name = "Ashwin" }]
+description = "LLM based synthetic dataset generator: context aware, relationship preserving and domain agnostic"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+
+authors = [
+    { name = "Ashwin B" }
+]
+
+requires-python = ">=3.9"
+
 dependencies = [
-    "openai>=1.0.0",
+    "openai",
     "pandas",
     "numpy",
     "pydantic"
 ]
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["synthetica*"]
+
+[project.urls]
+Homepage = "https://github.com/ashley1902/synthext"
+Repository = "https://github.com/ashley1902/synthext"
+Issues = "https://github.com/ashley1902/synthext/issues"

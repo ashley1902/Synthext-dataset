@@ -37,8 +37,8 @@ gen = DatasetGenerator(
         "payment_method",
         "shipping_city"
     ],
-    size=1000,
-    batch_size=50
+    size=100,
+    batch_size=60
 )
 
 print("=" * 60)
@@ -205,20 +205,30 @@ if relationships.entity_column:
     entity_col = relationships.entity_column
     first_entity = df[entity_col].iloc[0]
     entity_rows = df[df[entity_col] == first_entity].head(10)
-    
-    # Find derived columns to display
-    derived_cols = [c for c, r in relationships.columns.items() if r.role == "derived"]
-    if derived_cols:
+
+    # Find derived columns and their input columns from compute spec
+    derived_info = {}
+    for col_name, role in relationships.columns.items():
+        if role.role == "derived" and role.compute:
+            input_cols = set()
+            if role.compute.get("value_column"):
+                input_cols.add(role.compute["value_column"])
+            if role.compute.get("sign_column"):
+                input_cols.add(role.compute["sign_column"])
+            if role.depends_on:
+                input_cols.update(role.depends_on)
+            derived_info[col_name] = sorted(input_cols)
+
+    if derived_info:
+        # Collect all input columns across all derived columns
+        all_input_cols = sorted(set(c for cols in derived_info.values() for c in cols))
+        derived_cols = list(derived_info.keys())
+
         print(f"\n── Derived column verification for '{first_entity}' ──")
         for _, row in entity_rows.iterrows():
-            parts = []
-            for col in df.columns:
-                if col in (entity_col,) or col in derived_cols:
-                    continue
-                if col in ("order_total", "unit_price", "quantity", "transaction_amount"):
-                    parts.append(f"{col}={row.get(col, '?')}")
+            input_parts = [f"{col}={row.get(col, '?')}" for col in all_input_cols]
             derived_parts = [f"{dc}={row.get(dc, '?')}" for dc in derived_cols]
-            print(f"  {' | '.join(parts)}  →  {' | '.join(derived_parts)}")
+            print(f"  {' | '.join(input_parts)}  →  {' | '.join(derived_parts)}")
 
 df.to_csv("test_pipeline_output.csv", index=False)
 print("\n  Saved to test_pipeline_output.csv")

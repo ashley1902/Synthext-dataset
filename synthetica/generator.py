@@ -207,12 +207,12 @@ Columns and their types:
                     extra = f" → depends on {role.depends_on} | logic: {role.logic}"
                 elif role.role == "auto":
                     extra = f" → prefix='{role.prefix}', pad={role.pad}"
-                print(f"  • {col_name}: {role.role}{extra}")
+                print(f"  {col_name}: {role.role}{extra}")
 
             return result
 
         except Exception as e:
-            print(f"\n  ⚠ Relationship inference failed: {e}")
+            print(f"\n  Relationship inference failed: {e}")
             print(f"    Falling back to simple generation mode.")
             return RelationshipSpec(
                 entity_column=None,
@@ -462,7 +462,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
             elif method == "running_max":
                 self._compute_running_max(rows, col_name, compute, entity_col)
             else:
-                print(f"  ⚠ Unknown compute method '{method}' for '{col_name}' — skipping")
+                print(f"  Unknown compute method '{method}' for '{col_name}' — skipping")
 
     def _get_signed_value(self, row: dict, compute: dict) -> float:
         """Extract the numerical value with correct sign based on compute spec."""
@@ -500,7 +500,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
             running[entity] += signed_value
             row[col_name] = round(running[entity], 2)
 
-        print(f"  ✔ Computed '{col_name}' (running_sum) for {len(running)} entities")
+        print(f"  Computed '{col_name}' (running_sum) for {len(running)} entities")
 
     def _compute_running_average(
         self, rows: List[dict], col_name: str, compute: dict, entity_col: str | None
@@ -525,7 +525,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
             counts[entity] += 1
             row[col_name] = round(totals[entity] / counts[entity], 2)
 
-        print(f"  ✔ Computed '{col_name}' (running_average) for {len(totals)} entities")
+        print(f"  Computed '{col_name}' (running_average) for {len(totals)} entities")
 
     def _compute_running_count(
         self, rows: List[dict], col_name: str, compute: dict, entity_col: str | None
@@ -538,7 +538,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
             counts[entity] = counts.get(entity, 0) + 1
             row[col_name] = counts[entity]
 
-        print(f"  ✔ Computed '{col_name}' (running_count) for {len(counts)} entities")
+        print(f"  Computed '{col_name}' (running_count) for {len(counts)} entities")
 
     def _compute_running_min(
         self, rows: List[dict], col_name: str, compute: dict, entity_col: str | None
@@ -562,7 +562,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
 
             row[col_name] = round(mins[entity], 2)
 
-        print(f"  ✔ Computed '{col_name}' (running_min) for {len(mins)} entities")
+        print(f"  Computed '{col_name}' (running_min) for {len(mins)} entities")
 
     def _compute_running_max(
         self, rows: List[dict], col_name: str, compute: dict, entity_col: str | None
@@ -586,7 +586,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
 
             row[col_name] = round(maxs[entity], 2)
 
-        print(f"  ✔ Computed '{col_name}' (running_max) for {len(maxs)} entities")
+        print(f"  Computed '{col_name}' (running_max) for {len(maxs)} entities")
 
     # =========================================================
     # Post-processing
@@ -614,9 +614,9 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
                     str(r.get(entity_col, "")),
                     str(r.get(chrono_cols[0], ""))
                 ))
-                print(f"\n  ✔ Sorted rows by [{entity_col}, {chrono_cols[0]}]")
+                print(f"\n  Sorted rows by [{entity_col}, {chrono_cols[0]}]")
             except Exception as e:
-                print(f"  ⚠ Could not sort rows: {e}")
+                print(f"  Could not sort rows: {e}")
 
         # 2. Compute derived columns (MUST happen after sort so running calcs are correct)
         has_derived = any(r.role == "derived" for r in relationships.columns.values())
@@ -630,7 +630,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
                 pad = role.pad or 6
                 for i, row in enumerate(rows):
                     row[col_name] = f"{prefix}{str(i + 1).zfill(pad)}"
-                print(f"  ✔ Generated auto column '{col_name}' ({prefix}000001 ... {prefix}{str(len(rows)).zfill(pad)})")
+                print(f"  Generated auto column '{col_name}' ({prefix}000001 ... {prefix}{str(len(rows)).zfill(pad)})")
 
         return rows
 
@@ -645,7 +645,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
         """Generate data using entity-aware pipeline."""
 
         print("\n" + "=" * 60)
-        print("🔗 ENTITY MODE: Generating with relationship awareness")
+        print(" ENTITY MODE: Generating with relationship awareness")
         print("=" * 60)
 
         # 1. Generate entities
@@ -681,9 +681,9 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
 
             if len(rows) == 0:
                 consecutive_failures += 1
-                print(f"  ⚠ Got 0 rows (attempt {consecutive_failures}/{max_retries})")
+                print(f"  Got 0 rows (attempt {consecutive_failures}/{max_retries})")
                 if consecutive_failures >= max_retries:
-                    print(f"\n  ✖ Stopped after {max_retries} consecutive empty batches.")
+                    print(f"\n  Stopped after {max_retries} consecutive empty batches.")
                     print(f"    Generated {len(all_rows)}/{self.size} rows.")
                     break
             else:
@@ -692,7 +692,7 @@ Entity master data (use ONLY these entities — DO NOT create new ones):
             all_rows.extend(rows)
             remaining = self.size - len(all_rows)
 
-            print(f"  ✔ Got {len(rows)} rows → Total: {len(all_rows)}/{self.size}")
+            print(f"  Got {len(rows)} rows → Total: {len(all_rows)}/{self.size}")
 
         # 4. Post-process (sort + auto columns)
         print("\n=== POST-PROCESSING ===")
@@ -817,7 +817,7 @@ Number of rows:
         """Generate data using simple batch pipeline (no entity relationships)."""
 
         print("\n" + "=" * 60)
-        print("📋 SIMPLE MODE: Generating without entity relationships")
+        print(" SIMPLE MODE: Generating without entity relationships")
         print("=" * 60)
 
         schema_str = self._build_schema_str(specs)
@@ -842,9 +842,9 @@ Number of rows:
 
             if len(rows) == 0:
                 consecutive_failures += 1
-                print(f"  ⚠ Got 0 new rows (attempt {consecutive_failures}/{max_retries})")
+                print(f"   Got 0 new rows (attempt {consecutive_failures}/{max_retries})")
                 if consecutive_failures >= max_retries:
-                    print(f"\n  ✖ Stopped after {max_retries} consecutive empty batches.")
+                    print(f"\n  Stopped after {max_retries} consecutive empty batches.")
                     print(f"    Generated {len(all_rows)}/{self.size} rows.")
                     print(f"    Tip: reduce unique_columns or increase batch_size.")
                     break
@@ -854,7 +854,7 @@ Number of rows:
             all_rows.extend(rows)
             remaining = self.size - len(all_rows)
 
-            print(f"  ✔ Got {len(rows)} rows → Total: {len(all_rows)}/{self.size}")
+            print(f"  Got {len(rows)} rows → Total: {len(all_rows)}/{self.size}")
 
         all_rows = all_rows[:self.size]
         df = pd.DataFrame(all_rows)
@@ -869,7 +869,7 @@ Number of rows:
         """Generate the synthetic dataset."""
 
         print("\n" + "=" * 60)
-        print(f"🚀 SYNTHETICA — Generating {self.size} rows")
+        print(f" SYNTHETICA — Generating {self.size} rows")
         print(f"   Context: {self.context}")
         print(f"   Columns: {self.columns}")
         print(f"   Batch size: {self.batch_size}")
