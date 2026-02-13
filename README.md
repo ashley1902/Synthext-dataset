@@ -337,7 +337,7 @@ Returns a standard `pandas.DataFrame` with:
 ## Requirements
 
 - Python >= 3.9
-- OpenAI API key (GPT-4o-mini)
+- OpenAI API key 
 
 ## Contributing
 
